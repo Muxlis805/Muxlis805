@@ -1,336 +1,146 @@
-from telethon import TelegramClient, events, sync,utils
-from telethon.tl.functions.users import GetFullUserRequest
-from telethon.tl.functions.messages import GetDialogsRequest
-from telethon.tl.types import InputPeerEmpty, InputPeerChannel, InputPeerUser
-from telethon.errors.rpcerrorlist import (PeerFloodError, UserNotMutualContactError ,
-                                          UserPrivacyRestrictedError, UserChannelsTooMuchError,
-                                          UserBotError, InputUserDeactivatedError)
-from telethon.tl.functions.channels import InviteToChannelRequest
-import time,os,random,csv,sys
-r= "\u001b[31;1m"
-a= "\u001b[32m"
-y = "\u001b[33;1m"
-b="\u001b[34;1m"
-m="\u001b[35;1m"
-c="\u001b[36;1m"
-clear = lambda:os.system('clear')
+# socialscan
+[![Build Status](https://travis-ci.com/iojw/socialscan.svg?token=4yLRbSuqAQqrjanbzeXs&branch=master)](https://travis-ci.com/iojw/socialscan)
+[![Downloads](https://pepy.tech/badge/socialscan)](https://pepy.tech/project/socialscan/)
+[![MPL 2.0 license](https://img.shields.io/badge/License-MPL%202.0-blue.svg)](https://www.mozilla.org/en-US/MPL/2.0/)
+[![Python 3.6+](https://img.shields.io/badge/python-3.6+-green.svg)](https://www.python.org/downloads/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-__banner__ = a+"""*\t🔰DARKNET_OFF1CIAL🔰*
+socialscan offers **accurate** and **fast** checks for email address and username usage on online platforms.  
 
-                    xxxx                  xxxx
-                 x        x            x        x
-                x           x         x           x
-                     xx                    xx
-                   x    x                x    x
-                  x      x              x      x
-                  x      x              x      x
-                  x    xxx              x    xxx
-                  x   xxxx              x   xxxx
-                   x xxxx                x xxxx
-                    xxx         xxx       xxx
-                               x      x
-                               x       x
-                xx               xxx             xx
-              xx                                  xx
-            xxx                                    xxx
-               xx                                xx
-                 xx                             xx
-                   xxxx                      xxxx
-                        xxx               xxx
-                            xxxx     xxx
+Given an email address or username, socialscan returns whether it is available, taken or invalid on online platforms. 
 
+Features that differentiate socialscan from similar tools (e.g. knowem.com, Namechk, and Sherlock):
 
-\tᎢᗴᖇᗰᑌ᙭ ᑌᏃ ᑭᖇᏆᐯᗩᎢᗴ"""
-inf = (b+'@'+y+'d'+a+'a'+b+'r'+y+'k'+m+'n'+c+'e'+r+'t'+y+'_'+y+'o'+a+'f'+b+'f'+y+'1'+m+'c'+c+'a'+r+'l')
-el=0
-def Sleep(timE):
-    try:
-        time.sleep(timE)
-    except KeyboardInterrupt:
-        print(r+" KeyboardInterrupt , ........")
-def info():
-    print("")
-    print("")
-    print(__banner__)
-    print(inf)
-    print("")
-    print("")
-clear()
-info()
-def ospath():
-    o=int(input(b+" Nechta telegram akauntingiz bor ? : "))
-    for po in range(o):
-        if os.path.isfile('multi_log.txt'):
-            with open('multi_log.txt', 'r') as f:
-                data = f.readlines()
-            v=int(len(data)/2)
-            z=v
-        else:
-            z=0
-        api_id= input(b+' Telegram api_id_{}: '.format(z+1))
-        api_hash= input(' Telegram api_hash_{}: '.format(z+1))
-        with open('multi_log.txt', 'a') as f:
-            f.write(api_id+'\n'+api_hash+'\n')
-        client = TelegramClient("DarknetHack{}".format(z), api_id, api_hash)
-        client.start()
-        Sleep(1)
-        clear()
-        info()
-        client.disconnect()
-if os.path.isfile('multi_log.txt'):
-    xc=input(b+" Oxirgi amalni olib tashlamowchimisiz "+a+" (h/y) ? ")
-    if xc=='h':
-        cy=input(" Koproq akaunt qoshmoqchimisiz "+a+" (h/y) ? ")
-        if cy=='h':
-            ospath()
-        else:
-            pass
-    else:
-        cv=input(" Oxirgi amalni olib tashlamoqchimisiz "+a+" (h/ny) ? ")
-        if cv=='h':
-            with open('multi_log.txt', 'r') as f:
-                data = f.readlines()
-            v=int((len(data))/2)
-            con=input(r+" Oxirgi amal bn bogliq malumotlarni delete qilishga rozimisiz "+a+" (h/y) ? ")
-            if con in ['', 'y']:
-                print(m+" chiqilmoqda..."+'\n'+a+"hech qaysi fayl delete qilinmado ! ")
-                sys.exit(1)
-            elif con=='y':
-                print(r+ " Endi ohirgi amalga bogliq bolgan fayllar delete qilinmoqda..")
-                Sleep(1)
-                for d in range(v-1):
-                    os.remove("DarknetHack{}.session".format(d))
-                os.remove('multi_log.txt')          
-            ospath()
-        else:
-            sys.exit()
-else:
-    ospath()
+1. **100% accuracy**: socialscan's query method eliminates the false positives and negatives that often occur in similar tools, ensuring that results are always accurate.
 
-clear()
-info()
-x=0
-inh=2
-t=0
-with open('multi_log.txt', 'r') as f:
-    data = f.readlines()
-v=int(len(data)/2)
-for s in range(v):
-    api_id = data[t]
-    api_hash = data[t+1]
-    print(a+ ' \nAkauntga ulanish kutilmoqda..  {} \n'.format(x+1)+y+ ' \n api {}= '.format(x+1) +m+ api_id +'\n' +y+ ' api hash {} = '.format(x+1) +m+ api_hash)
-    Sleep(1)
-    client = TelegramClient("DarknetHack{}".format(x), api_id, api_hash)
-    client.start()
-    name=utils.get_display_name(client.get_me())
-    print(a+" \n\n   Akauntga ulandi {}\n\n".format(name))
-    t+=2
-    lines=[]
-    chats = []
-    last_date = None
-    chunk_size = 200
-    groups=[]
-    result = client(GetDialogsRequest(
-                 offset_date=last_date,
-                 offset_id=0,
-                 offset_peer=InputPeerEmpty(),
-                 limit=chunk_size,
-                 hash = 0
-             ))
-    chats.extend(result.chats)
-    for chat in chats:
-        try:
-            if chat.megagroup==True:
-                groups.append(chat)
-        except:
-            continue
-    print(b+' Qaysi grupadan odam olmoqchisiz:')
-    i=0
-    for g in groups:
-        print(m+str(i) +y+ ' - '+a + g.title)
-        i+=1
-    g_index = input(b+' Raqamni tanlang (Enter bosib otqazib yuborish): ')
-    if g_index == '' :
-        info()
-        print(m+" Yahshi. Otqazib yuborildi...")
-        Sleep(1)
-    else:
-        info()
-        target_group=groups[int(g_index)]
-        print(y+' Azolwr uhlatilmoqda...')
-        all_participants = []
-        all_participants = client.get_participants(target_group)
-        print(y+' Hotiraga saqlanmoqda...')
-        with open("Members.csv","w",encoding='UTF-8') as f:
-            writer=csv.writer(f,delimiter=",",lineterminator="\n")
-            for user in all_participants:
-                if user.username:
-                    username= user.username
-                else:
-                    username= ""
-                if user.first_name:
-                    first_name= user.first_name
-                else:
-                    first_name= ""
-                if user.last_name:
-                    last_name= user.last_name
-                else:
-                    last_name= ""
-                name= (first_name + ' ' + last_name).strip()
-                writer.writerow([username,user.id,user.access_hash,name,target_group.title, target_group.id])
-        print(a+' Azolar muvafaqiyatli kochirildi.')
-        Sleep(1)
-    info()
-    print(b+'Qayso guruhga kochirmoqchisiz:')
-    i=0
-    for group in groups:
-        print(m+str(i) +y+ ' - ' +a+ group.title)
-        i+=1
-    g_index = input(b+' Raqamni kiriting: ')
-    if g_index=='':
-        print(m+" \n U 've Enter bosing va chiqing...")
-        sys.exit()  
-    users = []  
-    with open('Members.csv', encoding='UTF-8') as f:
-        rows = csv.reader(f,delimiter=",",lineterminator="\n")
-        for row in rows:
-            lines.append(row)
-            user = {}
-            user['username'] = row[0]
-            user['id'] = int(row[1])
-            user['name'] = row[3]
-            users.append(user)
-    my_participants = client.get_participants(groups[int(g_index)])
-    target_group=groups[int(g_index)]
+2. **Speed**: socialscan uses [asyncio](https://docs.python.org/3/library/asyncio.html) along with [aiohttp](https://aiohttp.readthedocs.io/en/stable/) to conduct all queries concurrently, providing fast searches even with bulk queries involving hundreds of usernames and email addresses. On a test computer with average specs and Internet speed, 100 queries were executed in ~4 seconds.
 
-    target_group_entity = InputPeerChannel(target_group.id,target_group.access_hash)
-    my_participants_id = []
-    for my_participant in my_participants:
-        my_participants_id.append(my_participant.id)
-    info()
-    n,q=0,0
-    for user in users:
-        usR=str(user['id'])
-        n += 1
-        if n % 20 == 0:
-            info()
-            print (y+' waiting for 10 seconds to avoid flooding....')
-            Sleep(10)  
-        elif q>= 9:
-            client.disconnect()
-            if x<v:             
-                x+=1
-                inh+=1
-                break
-            else:
-                print(b+" Boshqa odamlar topilmadi...")
-                Sleep(1)
-                sys.exit()
-        if user['id'] in my_participants_id:
-            print(a+' Bu odan allaqachon bor ekan...')
-            n-=1
-            with open('Members.csv', 'r',encoding='UTF-8') as f:
-                dat = csv.reader(f,delimiter=",",lineterminator="\n")
-                for tad in dat:
-                    if usR in tad:
-                        lines.remove(tad)
-                        break
-            Sleep(1)       
-            continue
-        else:
-            try:
-                print (a+' Qoshish {}'.format(user['name']))
-                if True :
-                    if user['username'] == "":
-                        continue
-                user_to_add = client.get_input_entity(user['username'])
-                client(InviteToChannelRequest(target_group_entity,[user_to_add]))
-                print(m+" 2-4 sekund kuting...")
-                with open('Members.csv', 'r',encoding='UTF-8') as f:
-                    dat = csv.reader(f,delimiter=",",lineterminator="\n")
-                    for tad in dat:
-                        if usR in tad:
-                            lines.remove(tad)
-                            break
-                with open("Members.csv","w",encoding='UTF-8') as f:
-                    writer=csv.writer(f,delimiter=",",lineterminator="\n")
-                    for line in lines:
-                        writer.writerow(line)        
-                             
-                time.sleep(random.randrange(2,4))
-                
-                q=0
-            except PeerFloodError:
-                print(r+' Afsusku Spamm ekansiz spammdan chiqishiz bilan qayta harakat qib koring yoki boshqa akaunt kiriting.')
-                Sleep(1)
-                q+= 1
-            except UserPrivacyRestrictedError:
-                print(r+' Bu user\'s Nastroykasidan Maxfiylikni yoqqan ekan qosha olmadik.')
-                with open('Members.csv', 'r',encoding='UTF-8') as f:
-                    dat = csv.reader(f,delimiter=",",lineterminator="\n")
-                    for tad in dat:
-                        if usR in tad:
-                            lines.remove(tad)
-                            break
-                Sleep(1)
-            except UserBotError:
-                print(r+' Botlarni\'t Otqazib yuborish...')
-                with open('Members.csv', 'r',encoding='UTF-8') as f:
-                    dat = csv.reader(f,delimiter=",",lineterminator="\n")
-                    for tad in dat:
-                        if usR in tad:
-                            lines.remove(tad)
-                            break    
-            except InputUserDeactivatedError:
-                print(r+' Belgilangan foydalanuvchi ochirildi. Otqazib yuborilmoqda...')
-                with open('Members.csv', 'r',encoding='UTF-8') as f:
-                    dat = csv.reader(f,delimiter=",",lineterminator="\n")
-                    for tad in dat:
-                        if usR in tad:
-                            lines.remove(tad)
-                            break
-                Sleep(1)
-            except UserChannelsTooMuchError:
-                print(r+' Foydalanuvchi juda kop kanallar va guruhlarga wushilhan afsusku uni bu grupaga qushomemiz.')
-                with open('Members.csv', 'r',encoding='UTF-8') as f:
-                    dat = csv.reader(f,delimiter=",",lineterminator="\n")
-                    for tad in dat:
-                        if usR in tad:
-                            lines.remove(tad)
-                            break
-                Sleep(1)
-            except UserNotMutualContactError:
-                print(r+' ozaro raqam otqazib yuborildi.')
-                with open('Members.csv', 'r',encoding='UTF-8') as f:
-                    dat = csv.reader(f,delimiter=",",lineterminator="\n")
-                    for tad in dat:
-                        if usR in tad:
-                            lines.remove(tad)
-                            break
-                Sleep(1)
-            except KeyboardInterrupt:
-                i=0
-                kst=["stop","continue","switch to next account"]
-                for ks in kst:
-                    print('\n'+m+ str(i) +y+ ' - ' +a+ ks)
-                    i+=1
-                keyb=int(input(y+" Raqam kiriting : "))
-                if keyb==1:
-                    print(a+" yahshi daom etamiz...")
-                    Sleep(1)
-                elif keyb==0:
-                    print(y+" chiqilmoqda...")
-                    sys.exit(1)
-                else:
-                    print(a+ " \n\nkeyingi akauntga otish kutulmoqda...\n\n")
-                    x+=1
-                    break                
-            except Exception as e:
-                print(r+' Hatolik:', e)
-                print('Davom etilmoqda...')
-                q += 1
-                Sleep(1)
-                continue
-    
-    
-    
+3. **Library / CLI**: socialscan can be executed through a CLI, or imported as a Python library to be used with existing code.
+
+4. **Email support**: socialscan supports queries for both email addresses and usernames.
+
+The following platforms are currently supported:   
+
+|           | Username | Email |
+|:---------:|:--------:|:--------:|
+| Instagram |     ✔️    |   ✔️   |
+| Twitter   |     ✔️    |   ✔️   |
+|  GitHub   |     ✔️    |   ✔️   |
+|   Tumblr  |     ✔️    |   ✔️   |
+|  Lastfm   |     ✔️    |   ✔️   |
+|  Snapchat |     ✔️    |        |
+| GitLab    |     ✔️    |        |
+| Reddit    |     ✔️    |        |
+|  Yahoo    |     ✔️    |        |
+| Pinterest |            |   ✔️  |
+|  Spotify  |            |   ✔️  |
+|  Firefox  |            |   ✔️  |
+
+![](https://github.com/iojw/socialscan/raw/master/demo/demo.gif)
+![](https://github.com/iojw/socialscan/raw/master/demo/demo100.gif)
+
+## Background
+
+Other similar tools check username availability by requesting the profile page of the username in question and based on information like the HTTP status code or error text on the requested page, determine whether a username is already taken. This is a naive approach that fails in the following cases:
+
+- Reserved keywords: Most platforms have a set of keywords that they don't allow to be used in usernames  
+(A simple test: try checking reserved words like 'admin' or 'home' or 'root' and see if other services mark them as available)
+
+- Deleted/banned accounts: Deleted/banned account usernames tend to be unavailable even though the profile pages might not exist
+
+Therefore, these tools tend to come up with false positives and negatives. This method of checking is also dependent on platforms having web-based profile pages and cannot be extended to email addresses.
+
+socialscan aims to plug these gaps by directly querying the registration servers of the platforms instead, retrieving the appropriate CSRF tokens, headers, and cookies. 
+
+## Installation
+
+### pip
+```
+> pip install socialscan
+```
+
+### Install from source
+```
+> git clone https://github.com/iojw/socialscan.git  
+> cd socialscan  
+> pip install .
+```
+
+## Usage
+```
+usage: socialscan [list of usernames/email addresses to check]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --platforms [platform [platform ...]], -p [platform [platform ...]]
+                        list of platforms to query (default: all platforms)
+  --view-by {platform,query}
+                        view results sorted by platform or by query (default:
+                        query)
+  --available-only, -a  only print usernames/email addresses that are
+                        available and not in use
+  --cache-tokens, -c    cache tokens for platforms requiring more than one
+                        HTTP request (Snapchat, GitHub, Instagram. Lastfm &
+                        Tumblr), reducing total number of requests sent
+  --input input.txt, -i input.txt
+                        file containg list of queries to execute
+  --proxy-list proxy_list.txt
+                        file containing list of HTTP proxy servers to execute
+                        queries with
+  --verbose, -v         show query responses as they are received
+  --show-urls           display profile URLs for usernames on supported platforms
+                        (profiles may not exist if usernames are reserved or belong to deleted/banned accounts)
+  --json json.txt       output results in JSON format to the specified file
+  --version             show program's version number and exit
+```
+
+## As a library
+socialscan can also be imported into existing code and used as a library. 
+
+v1.0.0 introduces the async method `execute_queries` and the corresponding synchronous wrapper `sync_execute_queries` that takes a list of queries and optional list of platforms and proxies, executing all queries concurrently. The method then returns a list of results in the same order.
+
+```python
+from socialscan.util import Platforms, sync_execute_queries
+
+queries = ["username1", "email2@gmail.com", "mail42@me.com"]
+platforms = [Platforms.GITHUB, Platforms.LASTFM]
+results = sync_execute_queries(queries, platforms)
+for result in results:
+    print(f"{result.query} on {result.platform}: {result.message} (Success: {result.success}, Valid: {result.valid}, Available: {result.available})")
+```
+Output:
+```
+username1 on GitHub: Username is already taken (Success: True, Valid: True, Available: False)
+username1 on Lastfm: Sorry, this username isn't available. (Success: True, Valid: True, Available: False)
+email2@gmail.com on GitHub: Available (Success: True, Valid: True, Available: True)
+email2@gmail.com on Lastfm: Sorry, that email address is already registered to another account. (Success: True, Valid: True, Available: False)
+mail42@me.com on GitHub: Available (Success: True, Valid: True, Available: True)
+mail42@me.com on Lastfm: Looking good! (Success: True, Valid: True, Available: True)
+```
+
+## Text file input
+For bulk queries with the `--input` option, place one username/email on each line in the .txt file:
+```
+username1
+email2@mail.com
+username3
+```
+
+## Donations
+
+If you find this tool useful and would like to support its continued development, you can donate here. Thank you for your support.
+
+[![Donate Via PayPal](https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif)](https://paypal.me/isaacong)
+
+BTC: bc1qwrnukyc6xh9aygu5ps2geh8stmvagsj5u4v7j6  
+ETH: 0x45a0F91666391078eA521A6123559E49DAb1275f
+
+## Contributing
+Errors, suggestions or want a site added? [Submit an issue](https://github.com/iojw/socialscan/issues). 
+
+PRs are always welcome 🙂
+
+Please ensure that the code is formatted with `black` using the config in `pyproject.toml` before submitting a PR. 
+
+## License
+MPL 2.0

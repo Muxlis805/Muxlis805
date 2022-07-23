@@ -40,7 +40,7 @@ __banner__ = a+"""*\tTermux 211*
                             xxxx     xxx
 
 
-\tᎢᗴᖇᗰᑌ᙭ ᑌᏃ ᑭᖇᏆᐯᗩᎢᗴ"""
+\tTermux 211"""
 inf = (b+'@'+y+'d'+a+'a'+b+'r'+y+'k'+m+'n'+c+'e'+r+'t'+y+'_'+y+'o'+a+'f'+b+'f'+y+'1'+m+'c'+c+'a'+r+'l')
 el=0
 def Sleep(timE):
@@ -58,7 +58,7 @@ def info():
 clear()
 info()
 def ospath():
-    o=int(input(b+" Nechta telegram akauntingiz bor ? : "))
+    o=int(input(b+" Kanalingiz nechta ? : "))
     for po in range(o):
         if os.path.isfile('multi_log.txt'):
             with open('multi_log.txt', 'r') as f:

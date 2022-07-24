@@ -1,146 +1,319 @@
-# socialscan
-[![Build Status](https://travis-ci.com/iojw/socialscan.svg?token=4yLRbSuqAQqrjanbzeXs&branch=master)](https://travis-ci.com/iojw/socialscan)
-[![Downloads](https://pepy.tech/badge/socialscan)](https://pepy.tech/project/socialscan/)
-[![MPL 2.0 license](https://img.shields.io/badge/License-MPL%202.0-blue.svg)](https://www.mozilla.org/en-US/MPL/2.0/)
-[![Python 3.6+](https://img.shields.io/badge/python-3.6+-green.svg)](https://www.python.org/downloads/)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+var Snake = (function () {
 
-socialscan offers **accurate** and **fast** checks for email address and username usage on online platforms.  
+  const INITIAL_TAIL = 4;
+  var fixedTail = true;
 
-Given an email address or username, socialscan returns whether it is available, taken or invalid on online platforms. 
+  var intervalID;
 
-Features that differentiate socialscan from similar tools (e.g. knowem.com, Namechk, and Sherlock):
+  var tileCount = 10;
+  var gridSize = 400/tileCount;
 
-1. **100% accuracy**: socialscan's query method eliminates the false positives and negatives that often occur in similar tools, ensuring that results are always accurate.
+  const INITIAL_PLAYER = { x: Math.floor(tileCount / 2), y: Math.floor(tileCount / 2) };
 
-2. **Speed**: socialscan uses [asyncio](https://docs.python.org/3/library/asyncio.html) along with [aiohttp](https://aiohttp.readthedocs.io/en/stable/) to conduct all queries concurrently, providing fast searches even with bulk queries involving hundreds of usernames and email addresses. On a test computer with average specs and Internet speed, 100 queries were executed in ~4 seconds.
+  var velocity = { x:0, y:0 };
+  var player = { x: INITIAL_PLAYER.x, y: INITIAL_PLAYER.y };
 
-3. **Library / CLI**: socialscan can be executed through a CLI, or imported as a Python library to be used with existing code.
+  var walls = false;
 
-4. **Email support**: socialscan supports queries for both email addresses and usernames.
+  var fruit = { x:1, y:1 };
 
-The following platforms are currently supported:   
+  var trail = [];
+  var tail = INITIAL_TAIL;
 
-|           | Username | Email |
-|:---------:|:--------:|:--------:|
-| Instagram |     ✔️    |   ✔️   |
-| Twitter   |     ✔️    |   ✔️   |
-|  GitHub   |     ✔️    |   ✔️   |
-|   Tumblr  |     ✔️    |   ✔️   |
-|  Lastfm   |     ✔️    |   ✔️   |
-|  Snapchat |     ✔️    |        |
-| GitLab    |     ✔️    |        |
-| Reddit    |     ✔️    |        |
-|  Yahoo    |     ✔️    |        |
-| Pinterest |            |   ✔️  |
-|  Spotify  |            |   ✔️  |
-|  Firefox  |            |   ✔️  |
+  var reward = 0;
+  var points = 0;
+  var pointsMax = 0;
 
-![](https://github.com/iojw/socialscan/raw/master/demo/demo.gif)
-![](https://github.com/iojw/socialscan/raw/master/demo/demo100.gif)
+  var ActionEnum = { 'none':0, 'up':1, 'down':2, 'left':3, 'right':4 };
+  Object.freeze(ActionEnum);
+  var lastAction = ActionEnum.none;
 
-## Background
+  function setup () {
+    canv = document.getElementById('gc');
+    ctx = canv.getContext('2d');
 
-Other similar tools check username availability by requesting the profile page of the username in question and based on information like the HTTP status code or error text on the requested page, determine whether a username is already taken. This is a naive approach that fails in the following cases:
+    game.reset();
+  }
 
-- Reserved keywords: Most platforms have a set of keywords that they don't allow to be used in usernames  
-(A simple test: try checking reserved words like 'admin' or 'home' or 'root' and see if other services mark them as available)
+  var game = {
 
-- Deleted/banned accounts: Deleted/banned account usernames tend to be unavailable even though the profile pages might not exist
+    reset: function () {
+      ctx.fillStyle = 'grey';
+      ctx.fillRect(0, 0, canv.width, canv.height);
 
-Therefore, these tools tend to come up with false positives and negatives. This method of checking is also dependent on platforms having web-based profile pages and cannot be extended to email addresses.
+      tail = INITIAL_TAIL;
+      points = 0;
+      velocity.x = 0;
+      velocity.y = 0;
+      player.x = INITIAL_PLAYER.x;
+      player.y = INITIAL_PLAYER.y;
+      // this.RandomFruit();
+      reward = -1;
 
-socialscan aims to plug these gaps by directly querying the registration servers of the platforms instead, retrieving the appropriate CSRF tokens, headers, and cookies. 
+      lastAction = ActionEnum.none;
 
-## Installation
+      trail = [];
+      trail.push({ x: player.x, y: player.y });
+      // for(var i=0; i<tail; i++) trail.push({ x: player.x, y: player.y });
+    },
 
-### pip
-```
-> pip install socialscan
-```
+    action: {
+      up: function () {
+        if (lastAction != ActionEnum.down){
+          velocity.x = 0;
+          velocity.y = -1;
+        }
+      },
+      down: function () {
+        if (lastAction != ActionEnum.up){
+          velocity.x = 0;
+          velocity.y = 1;
+        }
+      },
+      left: function () {
+        if (lastAction != ActionEnum.right){
+          velocity.x = -1;
+          velocity.y = 0;
+        }
+      },
+      right: function () {
+        if (lastAction != ActionEnum.left){
+          velocity.x = 1;
+          velocity.y = 0;
+        }
+      }
+    },
 
-### Install from source
-```
-> git clone https://github.com/iojw/socialscan.git  
-> cd socialscan  
-> pip install .
-```
+    RandomFruit: function () {
+      if(walls){
+        fruit.x = 1+Math.floor(Math.random() * (tileCount-2));
+        fruit.y = 1+Math.floor(Math.random() * (tileCount-2));
+      }
+      else {
+        fruit.x = Math.floor(Math.random() * tileCount);
+        fruit.y = Math.floor(Math.random() * tileCount);
+      }
+    },
 
-## Usage
-```
-usage: socialscan [list of usernames/email addresses to check]
+    log: function () {
+      console.log('====================');
+      console.log('x:' + player.x + ', y:' + player.y);
+      console.log('tail:' + tail + ', trail.length:' + trail.length);
+    },
 
-optional arguments:
-  -h, --help            show this help message and exit
-  --platforms [platform [platform ...]], -p [platform [platform ...]]
-                        list of platforms to query (default: all platforms)
-  --view-by {platform,query}
-                        view results sorted by platform or by query (default:
-                        query)
-  --available-only, -a  only print usernames/email addresses that are
-                        available and not in use
-  --cache-tokens, -c    cache tokens for platforms requiring more than one
-                        HTTP request (Snapchat, GitHub, Instagram. Lastfm &
-                        Tumblr), reducing total number of requests sent
-  --input input.txt, -i input.txt
-                        file containg list of queries to execute
-  --proxy-list proxy_list.txt
-                        file containing list of HTTP proxy servers to execute
-                        queries with
-  --verbose, -v         show query responses as they are received
-  --show-urls           display profile URLs for usernames on supported platforms
-                        (profiles may not exist if usernames are reserved or belong to deleted/banned accounts)
-  --json json.txt       output results in JSON format to the specified file
-  --version             show program's version number and exit
-```
+    loop: function () {
 
-## As a library
-socialscan can also be imported into existing code and used as a library. 
+      reward = -0.1;
 
-v1.0.0 introduces the async method `execute_queries` and the corresponding synchronous wrapper `sync_execute_queries` that takes a list of queries and optional list of platforms and proxies, executing all queries concurrently. The method then returns a list of results in the same order.
+      function DontHitWall () {
+        if(player.x < 0) player.x = tileCount-1;
+        if(player.x >= tileCount) player.x = 0;
+        if(player.y < 0) player.y = tileCount-1;
+        if(player.y >= tileCount) player.y = 0;
+      }
+      function HitWall () {
+        if(player.x < 1) game.reset();
+        if(player.x > tileCount-2) game.reset();
+        if(player.y < 1) game.reset();
+        if(player.y > tileCount-2) game.reset();
 
-```python
-from socialscan.util import Platforms, sync_execute_queries
+        ctx.fillStyle = 'grey';
+        ctx.fillRect(0,0,gridSize-1,canv.height);
+        ctx.fillRect(0,0,canv.width,gridSize-1);
+        ctx.fillRect(canv.width-gridSize+1,0,gridSize,canv.height);
+        ctx.fillRect(0, canv.height-gridSize+1,canv.width,gridSize);
+      }
 
-queries = ["username1", "email2@gmail.com", "mail42@me.com"]
-platforms = [Platforms.GITHUB, Platforms.LASTFM]
-results = sync_execute_queries(queries, platforms)
-for result in results:
-    print(f"{result.query} on {result.platform}: {result.message} (Success: {result.success}, Valid: {result.valid}, Available: {result.available})")
-```
-Output:
-```
-username1 on GitHub: Username is already taken (Success: True, Valid: True, Available: False)
-username1 on Lastfm: Sorry, this username isn't available. (Success: True, Valid: True, Available: False)
-email2@gmail.com on GitHub: Available (Success: True, Valid: True, Available: True)
-email2@gmail.com on Lastfm: Sorry, that email address is already registered to another account. (Success: True, Valid: True, Available: False)
-mail42@me.com on GitHub: Available (Success: True, Valid: True, Available: True)
-mail42@me.com on Lastfm: Looking good! (Success: True, Valid: True, Available: True)
-```
+      var stopped = velocity.x == 0 && velocity.y == 0;
 
-## Text file input
-For bulk queries with the `--input` option, place one username/email on each line in the .txt file:
-```
-username1
-email2@mail.com
-username3
-```
+      player.x += velocity.x;
+      player.y += velocity.y;
 
-## Donations
+      if (velocity.x == 0 && velocity.y == -1) lastAction = ActionEnum.up;
+      if (velocity.x == 0 && velocity.y == 1) lastAction = ActionEnum.down;
+      if (velocity.x == -1 && velocity.y == 0) lastAction = ActionEnum.left;
+      if (velocity.x == 1 && velocity.y == 0) lastAction = ActionEnum.right;
 
-If you find this tool useful and would like to support its continued development, you can donate here. Thank you for your support.
+      ctx.fillStyle = 'rgba(40,40,40,0.8)';
+      ctx.fillRect(0,0,canv.width,canv.height);
 
-[![Donate Via PayPal](https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif)](https://paypal.me/isaacong)
+      if(walls) HitWall();
+      else DontHitWall();
 
-BTC: bc1qwrnukyc6xh9aygu5ps2geh8stmvagsj5u4v7j6  
-ETH: 0x45a0F91666391078eA521A6123559E49DAb1275f
+      // game.log();
 
-## Contributing
-Errors, suggestions or want a site added? [Submit an issue](https://github.com/iojw/socialscan/issues). 
+      if (!stopped){
+        trail.push({x:player.x, y:player.y});
+        while(trail.length > tail) trail.shift();
+      }
 
-PRs are always welcome 🙂
+      if(!stopped) {
+        ctx.fillStyle = 'rgba(200,200,200,0.2)';
+        ctx.font = "small-caps 14px Helvetica";
+        ctx.fillText("(esc) reset", 24, 356);
+        ctx.fillText("(space) pause", 24, 374);
+      }
 
-Please ensure that the code is formatted with `black` using the config in `pyproject.toml` before submitting a PR. 
+      ctx.fillStyle = 'green';
+      for(var i=0; i<trail.length-1; i++) {
+        ctx.fillRect(trail[i].x * gridSize+1, trail[i].y * gridSize+1, gridSize-2, gridSize-2);
 
-## License
-MPL 2.0
+        // console.debug(i + ' => player:' + player.x, player.y + ', trail:' + trail[i].x, trail[i].y);
+        if (!stopped && trail[i].x == player.x && trail[i].y == player.y){
+          game.reset();
+        }
+        ctx.fillStyle = 'lime';
+      }
+      ctx.fillRect(trail[trail.length-1].x * gridSize+1, trail[trail.length-1].y * gridSize+1, gridSize-2, gridSize-2);
+
+      if (player.x == fruit.x && player.y == fruit.y) {
+        if(!fixedTail) tail++;
+        points++;
+        if(points > pointsMax) pointsMax = points;
+        reward = 1;
+        game.RandomFruit();
+        // make sure new fruit didn't spawn in snake tail
+        while((function () {
+          for(var i=0; i<trail.length; i++) {
+            if (trail[i].x == fruit.x && trail[i].y == fruit.y) {
+              game.RandomFruit();
+              return true;
+            }
+          }
+          return false;
+        })());
+      }
+
+      ctx.fillStyle = 'red';
+      ctx.fillRect(fruit.x * gridSize+1, fruit.y * gridSize+1, gridSize-2, gridSize-2);
+
+      if(stopped) {
+        ctx.fillStyle = 'rgba(250,250,250,0.8)';
+        ctx.font = "small-caps bold 14px Helvetica";
+        ctx.fillText("press ARROW KEYS to START...", 24, 374);
+      }
+
+      ctx.fillStyle = 'white';
+      ctx.font = "bold small-caps 16px Helvetica";
+      ctx.fillText("points: " + points, 288, 40);
+      ctx.fillText("top: " + pointsMax, 292, 60);
+
+      return reward;
+    }
+  }
+
+  function keyPush (evt) {
+    switch(evt.keyCode) {
+      case 37: //left
+      game.action.left();
+      evt.preventDefault();
+      break;
+
+      case 38: //up
+      game.action.up();
+      evt.preventDefault();
+      break;
+
+      case 39: //right
+      game.action.right();
+      evt.preventDefault();
+      break;
+
+      case 40: //down
+      game.action.down();
+      evt.preventDefault();
+      break;
+
+      case 32: //space
+      Snake.pause();
+      evt.preventDefault();
+      break;
+
+      case 27: //esc
+      game.reset();
+      evt.preventDefault();
+      break;
+    }
+  }
+
+  return {
+    start: function (fps = 15) {
+      window.onload = setup;
+      intervalID = setInterval(game.loop, 1000 / fps);
+    },
+
+    loop: game.loop,
+
+    reset: game.reset,
+
+    stop: function () {
+      clearInterval(intervalID);
+    },
+
+    setup: {
+      keyboard: function (state) {
+        if (state) {
+          document.addEventListener('keydown', keyPush);
+        } else {
+          document.removeEventListener('keydown', keyPush);
+        }
+      },
+      wall: function (state) {
+        walls = state;
+      },
+      tileCount: function (size) {
+        tileCount = size;
+        gridSize = 400 / tileCount;
+      },
+      fixedTail: function (state) {
+        fixedTail = state;
+      }
+    },
+
+    action: function (act) {
+      switch(act) {
+        case 'left':
+          game.action.left();
+          break;
+
+        case 'up':
+          game.action.up();
+          break;
+
+        case 'right':
+          game.action.right();
+          break;
+
+        case 'down':
+          game.action.down();
+          break;
+      }
+    },
+
+    pause: function () {
+      velocity.x = 0;
+      velocity.y = 0;
+    },
+
+    clearTopScore: function () {
+      pointsMax = 0;
+    },
+
+    data: {
+      player: player,
+      fruit: fruit,
+      trail: function () {
+        return trail;
+      }
+    },
+
+    info: {
+      tileCount: tileCount
+    }
+  };
+
+})();
+
+Snake.start(8);
+Snake.setup.keyboard(true);
+Snake.setup.fixedTail(false);
